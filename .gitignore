@@ -2,12 +2,15 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-/target/
+
+
 ### IntelliJ IDEA ###
 .idea/
 *.iws
 *.iml
 *.ipr
+
+.allure/
 
 ### Eclipse ###
 .apt_generated
