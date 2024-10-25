@@ -1,5 +1,7 @@
 package pojo;
 
+import java.util.UUID;
+
 public class Courier {
     private String login;
     private String password;
@@ -14,6 +16,9 @@ public class Courier {
     public Courier() {
     }
 
+    public static String generateRandomLogin() {
+        return "kobi" + UUID.randomUUID().toString().substring(0, 8);
+    }
     public String getLogin() {
         return login;
     }

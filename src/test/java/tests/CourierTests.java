@@ -15,6 +15,9 @@ import static org.hamcrest.Matchers.*;
 @DisplayName("POST /api/v1/courier Создание курьера")
 public class CourierTests {
 
+    private static final String DEFAULT_PASSWORD = "1234";
+    private static final String DEFAULT_FIRST_NAME = "test";
+
     @Before
     public void setUp() {
         RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
@@ -24,13 +27,14 @@ public class CourierTests {
     @DisplayName("Создание курьера")
     @Description("Проверка, что курьер может быть успешно создан")
     public void createCourier() {
-        Courier courier = new Courier("nnnninja", "1234", "saske");
+        String randomLogin = Courier.generateRandomLogin();
+        Courier courier = new Courier(randomLogin, DEFAULT_PASSWORD, DEFAULT_FIRST_NAME);
         // Создаем курьера и проверяем ответ
         createCourierRequest(courier).then()
                 .statusCode(201)
                 .body("ok", equalTo(true));
         // Логинимся и удаляем курьера
-        String courierId = loginAndGetId(new LoginRequest(courier.getLogin(), courier.getPassword()));
+        String courierId = loginAndGetId(courier.getLogin(), courier.getPassword());
         deleteCourier(courierId);
     }
 
@@ -38,11 +42,11 @@ public class CourierTests {
     @DisplayName("Создание двух одинаковых курьеров")
     @Description("Проверка, что создание дубликата курьера возвращает ошибку")
     public void createDuplicateCourier() {
-        Courier courier = new Courier("kobu", "1234", "saske");
+        String randomLogin = Courier.generateRandomLogin();
+        Courier courier = new Courier(randomLogin, DEFAULT_PASSWORD, DEFAULT_FIRST_NAME);
         // Создаем первого курьера и логинимся, чтобы получить его ID
         createCourierRequest(courier);
-        LoginRequest loginRequest = new LoginRequest(courier.getLogin(), courier.getPassword());
-        String courierId = loginAndGetId(loginRequest);
+        String courierId = loginAndGetId(courier.getLogin(), courier.getPassword());
         // Создаем второго курьера с теми же данными
         Response response = createCourierRequest(courier);
         response.then()
@@ -56,7 +60,7 @@ public class CourierTests {
     @DisplayName("Создание курьера с пустым логином")
     @Description("Проверка, что отсутствие логина возвращает ошибку")
     public void createCourierWithEmptyLogin() {
-        Courier courier = new Courier("", "1234", "saske");
+        Courier courier = new Courier("", DEFAULT_PASSWORD, DEFAULT_FIRST_NAME);
         Response response = createCourierRequest(courier);
         response.then()
                 .statusCode(400)
@@ -67,7 +71,8 @@ public class CourierTests {
     @DisplayName("Создание курьера с пустым паролем")
     @Description("Проверка, что отсутствие пароля возвращает ошибку")
     public void createCourierWithEmptyPassword() {
-        Courier courier = new Courier("nnnnfinja", "", "saske");
+        String randomLogin = Courier.generateRandomLogin();
+        Courier courier = new Courier(randomLogin, "", DEFAULT_FIRST_NAME);
         Response response = createCourierRequest(courier);
         response.then()
                 .statusCode(400)
@@ -78,7 +83,7 @@ public class CourierTests {
     @DisplayName("Создание курьера с отсутствующим логином")
     @Description("Проверка, что отсутствие логина возвращает ошибку")
     public void createCourierWithMissingLogin() {
-        Courier courier = new Courier(null, "1234", "saske");
+        Courier courier = new Courier(null, DEFAULT_PASSWORD, DEFAULT_FIRST_NAME);
         Response response = createCourierRequest(courier);
         response.then()
                 .statusCode(400)
@@ -89,7 +94,8 @@ public class CourierTests {
     @DisplayName("Создание курьера с отсутствующим паролем")
     @Description("Проверка, что отсутствие пароля возвращает ошибку")
     public void createCourierWithMissingPassword() {
-        Courier courier = new Courier("nnnnffinja", null, "saske");
+        String randomLogin = Courier.generateRandomLogin();
+        Courier courier = new Courier(randomLogin, null, DEFAULT_FIRST_NAME);
         Response response = createCourierRequest(courier);
         response.then()
                 .statusCode(400)
@@ -100,7 +106,8 @@ public class CourierTests {
     @DisplayName("Создание курьера с отсутствующим именем")
     @Description("Проверка, что отсутствие имени возвращает ошибку")
     public void createCourierWithMissingFirstName() {
-        Courier courier = new Courier("nnnnffinja", "1234", null);
+        String randomLogin = Courier.generateRandomLogin();
+        Courier courier = new Courier(randomLogin, DEFAULT_PASSWORD, null);
         Response response = createCourierRequest(courier);
         response.then()
                 .statusCode(400)
@@ -119,10 +126,10 @@ public class CourierTests {
     }
 
     @Step("Авторизация и получение ID курьера")
-    private String loginAndGetId(LoginRequest loginRequest) {
+    private String loginAndGetId(String login, String password) {
         Response loginResponse = given()
                 .header("Content-Type", "application/json")
-                .body(loginRequest)
+                .body(new LoginRequest(login, password))
                 .when()
                 .post("/api/v1/courier/login")
                 .then()

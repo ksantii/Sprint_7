@@ -15,6 +15,9 @@ import static org.hamcrest.Matchers.*;
 @DisplayName("POST /api/v1/courier/login Логин курьера")
 public class CourierLoginTests {
 
+    private static final String DEFAULT_PASSWORD = "1234";
+    private static final String DEFAULT_FIRST_NAME = "test";
+
     @Before
     public void setUp() {
         RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
@@ -24,7 +27,8 @@ public class CourierLoginTests {
     @DisplayName("Курьер может войти в систему")
     @Description("Проверка, что курьер может успешно войти в систему")
     public void courierCanLogIn() {
-        Courier courier = new Courier("nnngww", "1234", "saske");
+        String randomLogin = Courier.generateRandomLogin();
+        Courier courier = new Courier(randomLogin, DEFAULT_PASSWORD, DEFAULT_FIRST_NAME);
         createCourier(courier).then().statusCode(201);
         // Авторизация и получение ID
         Response loginResponse = loginCourier(new LoginRequest(courier.getLogin(), courier.getPassword()));
@@ -38,7 +42,7 @@ public class CourierLoginTests {
     @DisplayName("Авторизация с пустым логином")
     @Description("Проверка, что при пустом логине возвращается ошибка")
     public void authorizationRequiresEmptyLogin() {
-        loginCourier(new LoginRequest("", "1234"))
+        loginCourier(new LoginRequest("", DEFAULT_PASSWORD))
                 .then().statusCode(400)
                 .body("message", equalTo("Недостаточно данных для входа"));
     }
@@ -47,7 +51,8 @@ public class CourierLoginTests {
     @DisplayName("Авторизация с пустым паролем")
     @Description("Проверка, что при пустом пароле возвращается ошибка")
     public void authorizationRequiresEmptyPassword() {
-        loginCourier(new LoginRequest("nnngww", ""))
+        String randomLogin = Courier.generateRandomLogin();
+        loginCourier(new LoginRequest(randomLogin, ""))
                 .then().statusCode(400)
                 .body("message", equalTo("Недостаточно данных для входа"));
     }
@@ -56,7 +61,7 @@ public class CourierLoginTests {
     @DisplayName("Возврат ошибки для неправильного логина с валидным паролем")
     @Description("Проверка, что система возвращает ошибку для неправильного логина")
     public void returnErrorForIncorrectLoginWithValidPassword() {
-        loginCourier(new LoginRequest("11111111", "1234"))
+        loginCourier(new LoginRequest("11111111", DEFAULT_PASSWORD))
                 .then().statusCode(404)
                 .body("message", equalTo("Учетная запись не найдена"));
     }
@@ -65,7 +70,8 @@ public class CourierLoginTests {
     @DisplayName("Возврат ошибки для неправильного пароля с валидным логином")
     @Description("Проверка, что система возвращает ошибку для неправильного пароля")
     public void returnErrorForIncorrectPasswordWithValidLogin() {
-        loginCourier(new LoginRequest("kobu", "aaaaa"))
+        String randomLogin = Courier.generateRandomLogin();
+        loginCourier(new LoginRequest(randomLogin, "aaaaa"))
                 .then().statusCode(404)
                 .body("message", equalTo("Учетная запись не найдена"));
     }
@@ -74,7 +80,8 @@ public class CourierLoginTests {
     @DisplayName("Авторизация под несуществующем курьером")
     @Description("Проверка, что система возвращает ошибку для несуществующего курьером")
     public void returnErrorForNonExistentUser() {
-        loginCourier(new LoginRequest("usekkkkr", "2222"))
+        String randomLogin = Courier.generateRandomLogin();
+        loginCourier(new LoginRequest(randomLogin, DEFAULT_PASSWORD))
                 .then().statusCode(404)
                 .body("message", equalTo("Учетная запись не найдена"));
     }
@@ -83,7 +90,7 @@ public class CourierLoginTests {
     @DisplayName("Авторизация без логина")
     @Description("Проверка, что отсутствие логина возвращает ошибку")
     public void authorizationRequiresMissingLogin() {
-        loginCourier(new LoginRequest(null, "1234"))
+        loginCourier(new LoginRequest(null, DEFAULT_PASSWORD))
                 .then().statusCode(400)
                 .body("message", equalTo("Недостаточно данных для входа"));
     }
@@ -92,7 +99,8 @@ public class CourierLoginTests {
     @DisplayName("Авторизация без пароля")
     @Description("Проверка, что отсутствие пароля возвращает ошибку")
     public void authorizationRequiresMissingPassword() {
-        loginCourier(new LoginRequest("nnngww", null))
+        String randomLogin = Courier.generateRandomLogin();
+        loginCourier(new LoginRequest(randomLogin, null))
                 .then().statusCode(400)
                 .body("message", equalTo("Недостаточно данных для входа"));
     }
