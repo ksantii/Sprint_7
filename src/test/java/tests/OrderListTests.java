@@ -1,10 +1,12 @@
 package tests;
 
 import io.restassured.RestAssured;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import io.qameta.allure.junit4.DisplayName;
 import io.qameta.allure.Description;
+import pojo.Endpoints;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
@@ -13,7 +15,7 @@ public class OrderListTests {
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
+        RestAssured.baseURI = Endpoints.BASE_URI;
     }
 
     @Test
@@ -22,9 +24,9 @@ public class OrderListTests {
     public void getOrdersList() {
         given()
                 .header("Content-Type", "application/json")
-                .get("/api/v1/orders")
+                .get(Endpoints.ORDERS)
                 .then()
-                .statusCode(200)
+                .statusCode(HttpStatus.SC_OK)
                 .body("orders", is(not(empty())));
     }
 }

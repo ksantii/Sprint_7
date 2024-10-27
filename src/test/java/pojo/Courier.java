@@ -1,11 +1,13 @@
 package pojo;
 
-import java.util.UUID;
+import com.github.javafaker.Faker;
 
 public class Courier {
     private String login;
     private String password;
     private String firstName;
+
+    private static final Faker faker = new Faker();
 
     public Courier(String login, String password, String firstName) {
         this.login = login;
@@ -17,8 +19,17 @@ public class Courier {
     }
 
     public static String generateRandomLogin() {
-        return "kobi" + UUID.randomUUID().toString().substring(0, 8);
+        return faker.name().username();
     }
+
+    public static String generateRandomPassword() {
+        return faker.internet().password();
+    }
+
+    public static String generateRandomFirstName() {
+        return faker.name().firstName();
+    }
+
     public String getLogin() {
         return login;
     }
