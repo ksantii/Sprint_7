@@ -2,6 +2,7 @@ package tests;
 
 import io.qameta.allure.Step;
 import io.restassured.RestAssured;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,6 +10,8 @@ import org.junit.runners.Parameterized;
 import io.qameta.allure.junit4.DisplayName;
 import io.qameta.allure.Description;
 import pojo.OrderRequest;
+import pojo.Endpoints;
+import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
@@ -17,23 +20,28 @@ import static org.hamcrest.Matchers.*;
 public class OrderTests {
 
     @Parameterized.Parameter
-    public String color;
+    public List<String> colors;
 
-    @Parameterized.Parameters(name = "Тест с цветом: {0}")
-    public static Object[] data() {
-        return new Object[] { "BLACK", "GREY", "BLACK,GREY", null };
+    @Parameterized.Parameters(name = "Тест с цветами: {0}")
+    public static Object[][] data() {
+        return new Object[][]{
+                {List.of("BLACK")},
+                {List.of("GREY")},
+                {List.of("BLACK", "GREY")},
+                {List.of()}
+        };
     }
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru/";
+        RestAssured.baseURI = Endpoints.BASE_URI;
     }
 
     @Test
     @DisplayName("Создание заказа с цветом")
     @Description("Проверка создания заказа с различными цветами")
     public void createOrderWithColor() {
-        logColor(color);
+        logColors(colors);
         OrderRequest orderRequest = new OrderRequest(
                 "Naruto",
                 "Uchiha",
@@ -43,20 +51,21 @@ public class OrderTests {
                 5,
                 "2020-06-06",
                 "Saske, come back to Konoha",
-                color != null ? color.split(",") : new String[]{}
+                colors.toArray(new String[0]) // Преобразуем список в массив
         );
 
         given()
                 .header("Content-Type", "application/json")
                 .body(orderRequest)
                 .when()
-                .post("/api/v1/orders")
+                .post(Endpoints.ORDERS)
                 .then()
-                .statusCode(201)
+                .statusCode(HttpStatus.SC_CREATED)
                 .body("track", notNullValue());
     }
 
-    @Step("Тестируемый цвет: {0}")
-    public void logColor(String color) {
+    @Step("Тестируемые цвета: {0}")
+    public void logColors(List<String> colors) {
+        // Логирование цветов для отладки
     }
 }
