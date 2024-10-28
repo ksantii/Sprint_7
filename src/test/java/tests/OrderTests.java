@@ -51,13 +51,12 @@ public class OrderTests {
                 5,
                 "2020-06-06",
                 "Saske, come back to Konoha",
-                colors.toArray(new String[0]) // Преобразуем список в массив
+                colors
         );
 
         given()
                 .header("Content-Type", "application/json")
                 .body(orderRequest)
-                .when()
                 .post(Endpoints.ORDERS)
                 .then()
                 .statusCode(HttpStatus.SC_CREATED)
@@ -66,6 +65,5 @@ public class OrderTests {
 
     @Step("Тестируемые цвета: {0}")
     public void logColors(List<String> colors) {
-        // Логирование цветов для отладки
     }
 }
