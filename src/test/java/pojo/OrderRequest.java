@@ -1,5 +1,7 @@
 package pojo;
 
+import java.util.List;
+
 public class OrderRequest {
     private String firstName;
     private String lastName;
@@ -9,9 +11,9 @@ public class OrderRequest {
     private int rentTime;
     private String deliveryDate;
     private String comment;
-    private String[] color;
+    private List<String> color;
 
-    public OrderRequest(String firstName, String lastName, String address, int metroStation, String phone, int rentTime, String deliveryDate, String comment, String[] color) {
+    public OrderRequest(String firstName, String lastName, String address, int metroStation, String phone, int rentTime, String deliveryDate, String comment, List<String> color) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
@@ -23,7 +25,7 @@ public class OrderRequest {
         this.color = color;
     }
 
-    public OrderRequest() {
+        public OrderRequest() {
     }
 
     public String getFirstName() {
@@ -90,11 +92,11 @@ public class OrderRequest {
         this.comment = comment;
     }
 
-    public String[] getColor() {
+    public List<String> getColor() {
         return color;
     }
 
-    public void setColor(String[] color) {
+    public void setColor(List<String> color) {
         this.color = color;
     }
 }
